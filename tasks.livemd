@@ -1,0 +1,25 @@
+# Dive Into WebRTC
+
+## Theoretical introduction to WebRTC
+
+### Setup
+
+* Chrome browser [Download](https://www.google.com/chrome/)
+* Elixr & Erlang
+* Wireshark [Download](https://www.wireshark.org), [Docs](https://www.wireshark.org/docs/wsug_html/)
+
+### Project setup
+
+```bash
+mix archive.install hex phx_new
+mix phx.new \
+  --no-ecto \
+  --no-live \
+  --no-tailwind \
+  --no-mailer \
+  --no-gettext \
+  --no-dashboard \
+  webrtc_playground
+```
+
+## getUserMedia
