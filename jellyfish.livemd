@@ -89,3 +89,17 @@ npm install jellyfish-dev/jellyfish-react-client/jellyfish#main --save
 ```
 
 Now we're ready to start development of our own videoconferencing app.
+
+## Client to backend connection
+
+We'll start by setting up our frontend to backend connection and calling Jellyfish API. Our goal will be to obtain a token associated with a room and peer that frontend can use to establish a direct connection to Jellyfish.
+
+Later on, we'll build architecture managing the rooms and peers on our backend, but we'll start with something much simpler:
+
+1. For authorization, we'll need to setup the same secret/token as passed to the Jellyfish. I'd suggest setting it in `config.exs`, but it can be hard-coded for now.
+2. Create a new [`Phoenix.Channel`](https://hexdocs.pm/phoenix/channels.html)
+3. On join, send messsage to self and let the user join.
+4. Handle the message sent above and create a new [`Jellyfish.Client`](https://hexdocs.pm/jellyfish_server_sdk/Jellyfish.Client.html) and use it to create a new [`Jellyfish.Room`](https://hexdocs.pm/jellyfish_server_sdk/Jellyfish.Room.html). Then add a new `webtrc` peer to the room. Remember to assign client, room and the peer to the socket.
+5. From the above callback push the token over socket
+6. We should be handling termination of the room - we will handle it better later, for now we may add a simple process monitoring channel's process calling `Room.delete` on channel exit.
+7. Go to the JS part of the channel and handle the token message.
