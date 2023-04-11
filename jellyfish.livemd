@@ -1,9 +1,5 @@
 # Creating Jellyfish conference
 
-```elixir
-nil
-```
-
 ## Resources
 
 TODO
@@ -103,3 +99,23 @@ Later on, we'll build architecture managing the rooms and peers on our backend, 
 5. From the above callback push the token over socket
 6. We should be handling termination of the room - we will handle it better later, for now we may add a simple process monitoring channel's process calling `Room.delete` on channel exit.
 7. Go to the JS part of the channel and handle the token message.
+
+## Frontend - let's send some media to Jellyfish
+
+The next step is to use the obtained token to start sending media to Jellyfish. We're going to use JS WebRTC APIs and [Jellyfish TS client](https://github.com/jellyfish-dev/jellyfish-react-client/blob/update-readme/src/jellyfish/readme.md).
+
+## Room management
+
+It is now time to get back to our backend. We need to build an infrastructure around rooms to enable connecting the peers.
+
+1. Add a registry to `application.exs`
+2. Create a `GenServer` called `Meeting` responsible for creating Jellyfish room. API:
+   * A function for getting a room from registry or spawning a new one if it doesn't exist
+   * Should get a name as a starting parameter and use it as a key to register in the Registry
+   * Create a room right after start (`handle_continue`)
+   * Accept a call for room join that will return a token and monitor the caller
+   * Notify the peers about new peers joining
+   * TODO: continue
+3. Create a form at root path to input room name and redirect to `/room/:name`
+4. Add a layout for `/room/:name` path
+5. Adjust Channel to spawn or call the room process based on registry
