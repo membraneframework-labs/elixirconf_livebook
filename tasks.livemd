@@ -175,14 +175,13 @@ You can observe some stats about your connection in [WebRTC internals](chrome://
 
 The next step in our journey will be connecting two peers from different device.
 But there is a small obstacle, page that want to get access to device camera has to have configured SSL cerficate properly and also client must connect through HTTPS. 
-So there are two solutions for this:
 
-* deploy your app through service that will handle SSL for you e.g: [fly.io](https://fly.io/)
-* we can handle it with use of [NGROK](https://ngrok.com/), this is recommended way and will be described below
+So there are two solutions for this: 
+- deploy your app through service that will handle SSL for you e.g: [fly.io](https://fly.io/)
+- we can handle it with use of [NGROK](https://ngrok.com/), this is recommended way and will be described below
 
 1. Create a free account at NGROK
 2. Install [NGROK cli tools](https://ngrok.com/download)
 3. Setup your authtoken
 4. Create http tunnel to your phoenix app. ([docs](https://ngrok.com/docs/secure-tunnels/tunnels/http-tunnels/))
-5. Find in NGROK dashboard address to you app
-6. Update configuration of you Phoenix endpoint in file `runtime.exs`
+5. Go to address created by ngrok and test your app.
