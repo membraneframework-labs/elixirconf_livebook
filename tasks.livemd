@@ -62,7 +62,10 @@ So to sum what we want to achieve after this section:
 
 The next step will be to configure `iceCandidate` handler. ICE candidates are used for connection establishment. Each candidate contains information about what protocol it supports (TCP/UDP/TLS) and what type of candidate it is (host/server reflexive/relay). For now, we can only want to inspect them, so let's log them to the console.
 
-After implementing iceCandidate handler we have to change current local description of our connection. We can do that by calling a proper method on [peerConnection object](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection). After this step and refreshing browser you should see logged ice candidates. Try to answer on following question: how many ice candidates do you see, what types do they have, what are differences between candidates?
+After implementing `iceCandidate` handler we have to change the current local description of our connection. We can do that by calling a proper method on [peerConnection object](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection). After this step and refreshing browser, you should see logged ICE candidates. Try to answer the following questions:
+* how many ice candidates do you see?
+* what types do they have?
+* what are the differences between candidates?
 
 After that we will change initial configuration of PeerConnection. You can do that by passing parameters to its [constructor](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection). Let's start with setting `bundlePolicy` to `max-bundle`. What did change in compare to previous candidates?
 
