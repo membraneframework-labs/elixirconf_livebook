@@ -73,7 +73,7 @@ Next we want to add STUN servers to PeerConnection configuartion, we will use he
 
 ```javascript
 iceServers: [
- {urls: "stun:turn.membraneframework.org:19302"},
+ {urls: "stun:turn.membrane.video"},
  // in case of failure {urls: "stun:stun.l.google.com:19302" }
 ]
 ```
