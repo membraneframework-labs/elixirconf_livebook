@@ -46,7 +46,7 @@ Okay, it's a good start, now our next goal will be to create a P2P connection th
 
 To create a connection between two peers we will need to create an [RTCPeerConnection object](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection). It stores all the information about the current connection and we can modify that connection by calling methods on this object. Before sending media through PeerConnection we have to add tracks, which we want to send. We can get these tracks from our MediaStream as it aggregates MediaTracks. Unfortunately, we can't simply add MediaStream to a PeerConnection. Instead, we have to iterate over MediaTracks and add them one by one.
 
-After adding tracks we can create SDP offer from our PeerConnection. SDP negotiation allow peers to decide what parameters will have media going through connection. For getting brief intuition offerer informs what type of tracks he can send and receive. The anserwer responds with information what he can receive and what he will send from its possibilities.
+After adding tracks we can create an SDP offer from our PeerConnection. SDP negotiation allows peers to decide what parameters will the media going through connection have. In essence, the offerer sends a list of tracks including their type, direction (send/receive) and possible codecs. The other peer responds with an answer containing that list filtered by his capabilities. It can be seen as an intersection of things supported and accepted by both peers.
 
 So to sum what we want to achieve after this section:
 
