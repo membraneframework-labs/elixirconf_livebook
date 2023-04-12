@@ -42,7 +42,7 @@ As a result you should see a video of yourself on the main page of application.
 
 <!-- livebook:{"break_markdown":true} -->
 
-Okay it's a good start, now our next goal will be to create a P2P connection through WebRTC so we want to video of second peer. But to achieve that we will need some more information about used API.
+Okay, it's a good start, now our next goal will be to create a P2P connection through WebRTC, so we want to see the video of a second peer. To achieve that we will need some more information about the used API.
 
 To create a connection between two peers we will need to create an [RTCPeerConnection object](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection). In this object all information about current connection are stored and we can modify our current connection by calling methods on instance of this object. Before sending media through PeerConnection we have to add tracks, which we want send. We can get these tracks from our MediaStream, because MediaStream aggregates MediaTrack. Unfortunately we can't simply add MediaStream to PeerConnection, instead we have to add seperate MediaTracks.
 
