@@ -80,7 +80,7 @@ iceServers: [
 
 What did change after this modification?
 
-Then we can optionally add also TURN servers to PeerConnection.
+Then, we can also add TURN servers to the PeerConnection.
 
 ```javascript
 iceServers: [
