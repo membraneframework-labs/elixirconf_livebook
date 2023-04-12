@@ -83,9 +83,9 @@ Then we can optionally add also TURN servers to PeerConnection.
 iceServers: [
  {
    urls: [
-     "turn:turn.membraneframework.org?transport=udp",
-     "turn:turn.membraneframework.org:3478?transport=tcp",
-     "turns:turn.membraneframework.org:443?transport=tcp"
+     "turn:turn.membrane.video?transport=udp",
+     "turn:turn.membrane.video:3478?transport=tcp",
+     "turns:turn.membrane.video:443?transport=tcp"
    ],
    username: "turn",
    credential: "T45B264i89p9"
