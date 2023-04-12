@@ -67,7 +67,7 @@ After implementing `iceCandidate` handler we have to change the current local de
 * what types do they have?
 * what are the differences between candidates?
 
-After that we will change initial configuration of PeerConnection. You can do that by passing parameters to its [constructor](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection). Let's start with setting `bundlePolicy` to `max-bundle`. What did change in compare to previous candidates?
+After that, we will change the initial configuration of PeerConnection. You can do that by passing parameters to its [constructor](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection). Let's start with setting `bundlePolicy` to `max-bundle`. What did change in comparison to previous candidates?
 
 Next we want to add STUN servers to PeerConnection configuartion, we will use here our Membrane servers:
 
