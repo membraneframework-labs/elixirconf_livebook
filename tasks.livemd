@@ -31,7 +31,7 @@ This function returns you a promise of MediaStream object. As for this object, t
 So here is a list of todos (in parentheses will be listed names of files where modifications should be made):
 
 1. Acquire a MediaStream from your local camera (`app.js`)
-2. Add video element to page (`index.html.heex`)
+2. Remove Phoenix boilerplate and add video element. Remember about an id! (`index.html.heex`)
 3. Insert MediaStream to created video element as it srcObject (`app.js`)
 
 As a result you should see a video of yourself on the main page of application.
@@ -112,13 +112,13 @@ How candidates look after this modification?
 
 <!-- livebook:{"break_markdown":true} -->
 
-After learning a little bit about ice candidates and configuration of PeerConnection we can comment out code responsible for printing out candidates and we can move toward implementing signaling server.
+After learning a little bit about ice candidates and the configuration of PeerConnection we can comment out the code responsible for printing out candidates and move toward implementing a signaling server.
 
-But we should start from that, what signaling server is. 
-Signaling server is an intermediary between two peers that want to connect, it also minimizing exposure of potentially private information during establishing connection between these two peers. 
-Example information that will go through signaling server are SDP Offer, SDP Answer and ICE candidates.
-WebRTC standard doesn't specify transport mechanism for the signaling information, so we will Phoenix Channels for this. 
-If someone doesn't know, Phoenix channel is a lightweight wrapper on WebSockets, which allows for creating logic channels inside one connection.
+But we should start by learning what a signaling server is. 
+A signaling server is an intermediary between two peers that want to connect, it also minimises exposure of potentially private information during establishing a connection between these two peers. 
+Examples of information that will go through signaling server are SDP Offer, SDP Answer and ICE candidates.
+WebRTC standard doesn't specify any transport mechanism for the signaling, so we will use [Phoenix Channels](https://hexdocs.pm/phoenix/channels.html) for this. 
+They enable bidirectional, soft real-time communication between the server and clients, usually based on WebSockets and integrated with Phoenix PubSub solution.
 
 First we have to implement our signaling server. 
 We will add two modules: `Room` and `PeerChannel`.
@@ -176,11 +176,11 @@ You can observe some stats about your connection in [WebRTC internals](chrome://
 
 <!-- livebook:{"break_markdown":true} -->
 
-The next step in our journey will be connecting two peers from different device.
-But there is a small obstacle, page that want to get access to device camera has to have configured SSL cerficate properly and also client must connect through HTTPS. 
+The next step in our journey will be connecting two peers from different devices.
+There is a small obstacle though, a page that wants to access media devices has to use a secure connection (there's an exception for `localhost`), so it should be served via HTTPS with a valid SSL certificate. 
 
-So there are two solutions for this: 
-- deploy your app through service that will handle SSL for you e.g: [fly.io](https://fly.io/)
+There are two fairly simple ways to work around this: 
+- deploy your app through a service that will handle SSL for you e.g: [fly.io](https://fly.io/)
 - we can handle it with use of [NGROK](https://ngrok.com/), this is recommended way and will be described below
 
 1. Create a free account at NGROK
