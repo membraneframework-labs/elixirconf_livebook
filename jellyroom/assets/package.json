@@ -1,9 +1,8 @@
 {
   "dependencies": {
-    "@jellyfish-dev/jellyfish-react-client": "github:jellyfish-dev/jellyfish-react-client",
-    "@jellyfish-dev/membrane-webrtc-js": "^0.4.5",
+    "@jellyfish-dev/membrane-webrtc-js": "github:jellyfish-dev/membrane-webrtc-js#Change-client-to-extend-event-emitter",
+    "@jellyfish-dev/ts-client-sdk": "github:jellyfish-dev/ts-client-sdk",
     "esbuild": "0.17.16",
-    "react": "^18.2.0",
     "typed-emitter": "^2.1.0",
     "typescript": "^5.0.4"
   }

@@ -8,6 +8,7 @@ defmodule Jellyroom.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      {Jellyroom.Room, {}},
       # Start the Telemetry supervisor
       JellyroomWeb.Telemetry,
       # Start the PubSub system

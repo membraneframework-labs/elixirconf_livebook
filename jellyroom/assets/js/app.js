@@ -42,15 +42,26 @@ import "phoenix_html"
 import { createClient } from "./connection.ts"
 import { Socket } from "phoenix"
 
-const socket = new Socket("/socket")
-socket.connect()
-let channel = socket.channel("room")
-let client
-
-channel.on("token", (token) => {
-    console.log("Received", token)
-    client = createClient(token)
-})
+const init = async () => {
+    const localStream = await navigator.mediaDevices.getUserMedia({ audio: false, video: true })
+    document.querySelector('#local-video').srcObject = localStream;
 
 
-channel.join()
+    const socket = new Socket("/socket")
+    socket.connect()
+    let channel = socket.channel("room")
+    let client
+
+    channel.on("token", (token) => {
+        console.log("Received", token)
+        client = createClient(token, localStream)
+    })
+
+
+    channel.join()
+
+}
+
+init()
+
+
