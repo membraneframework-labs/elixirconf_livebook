@@ -10,7 +10,7 @@ defmodule JellyroomWeb.RoomSocket do
   # Uncomment the following line to define a "room:*" topic
   # pointing to the `JellyroomWeb.RoomChannel`:
   #
-  channel("room", JellyroomWeb.RoomChannel)
+  channel("room:*", JellyroomWeb.RoomChannel)
   #
   # To create a channel file, use the mix task:
   #

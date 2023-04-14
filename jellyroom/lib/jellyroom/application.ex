@@ -8,15 +8,16 @@ defmodule Jellyroom.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      {Jellyroom.Room, {}},
+      # {Jellyroom.Meeting, {}},
       # Start the Telemetry supervisor
       JellyroomWeb.Telemetry,
       # Start the PubSub system
       {Phoenix.PubSub, name: Jellyroom.PubSub},
       # Start the Endpoint (http/https)
-      JellyroomWeb.Endpoint
+      JellyroomWeb.Endpoint,
       # Start a worker by calling: Jellyroom.Worker.start_link(arg)
       # {Jellyroom.Worker, arg}
+      {Registry, keys: :unique, name: Jellyroom.MeetingRegistry}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

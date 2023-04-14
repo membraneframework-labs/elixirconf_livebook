@@ -6,4 +6,8 @@ defmodule JellyroomWeb.PageController do
     # so skip the default app layout.
     render(conn, :home, layout: false)
   end
+
+  def meeting(conn, _params) do
+    render(conn, :meeting, layout: false)
+  end
 end

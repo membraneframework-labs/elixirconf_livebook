@@ -42,14 +42,14 @@ import "phoenix_html"
 import { createClient } from "./connection.ts"
 import { Socket } from "phoenix"
 
-const init = async () => {
+const initMeeting = async (room_id) => {
     const localStream = await navigator.mediaDevices.getUserMedia({ audio: false, video: true })
     document.querySelector('#local-video').srcObject = localStream;
 
 
     const socket = new Socket("/socket")
     socket.connect()
-    let channel = socket.channel("room")
+    let channel = socket.channel(`room:${room_id}`)
     let client
 
     channel.on("token", (token) => {
@@ -57,11 +57,26 @@ const init = async () => {
         client = createClient(token, localStream)
     })
 
-
     channel.join()
+        .receive("ok", resp => { console.log("Joined successfully", resp) })
+        .receive("error", resp => { console.log("Unable to join", resp) })
 
 }
 
-init()
+const init = async () => {
+    const btn = document.querySelector('#button')
+    const text = document.querySelector('#name')
+    btn.onclick = () => {
+        window.location = `room/${text.value}`
+    }
 
+}
+
+const full_url = document.URL; // Get current url
+const url_array = full_url.split('/') // Split the string into an array with / as separator
+const last_segment = url_array[url_array.length - 1];
+
+
+if (url_array.length > 2 && url_array[url_array.length - 2] == "room") initMeeting(last_segment)
+else init()
 
