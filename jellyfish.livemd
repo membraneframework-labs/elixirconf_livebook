@@ -22,7 +22,7 @@ VIRTUAL_HOST=localhost
 PORT=5000
 
 # Token used by the backend to connect to the server
-TOKEN=notoken
+SERVER_API_TOKEN=development
 
 # TURN default configuration
 # note: loopback address as INTEGRATED_TURN_IP cannot be used inside a Docker container
@@ -123,7 +123,7 @@ Our goal will be to obtain a token associated with a room and peer that frontend
 Later on, we'll build architecture managing the rooms and peers on our backend, but we'll start with something much simpler. 
 After this section each peer should create their own room and join it sucesfully.
 
-1. For authorization in jellyfish, we'll need to setup the same secret/token as passed to the Jellyfish. I'd suggest setting it in `config.exs`, but it can be hard-coded for now.
+1. For authorization in jellyfish, we'll need to setup the same secret/token as passed to the Jellyfish. We can do this by setting in `config.exs` variable `:server_api_token` in application `:jellyfish_server_sdk`, but we can also pass in construction of sdk client.
 2. Create a new [`Phoenix.Channel`](https://hexdocs.pm/phoenix/channels.html)
 3. On join, send messsage to `self` and let the user join.
 4. Handle the message sent above and create a new [`Jellyfish.Client`](https://hexdocs.pm/jellyfish_server_sdk/Jellyfish.Client.html) and use it to create a new [`Jellyfish.Room`](https://hexdocs.pm/jellyfish_server_sdk/Jellyfish.Room.html). Then add a new `webtrc` peer to the room. Remember to assign `client`, `room_id` and `peer_id` to socket.
