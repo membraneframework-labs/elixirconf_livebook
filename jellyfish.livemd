@@ -6,7 +6,7 @@ TODO
 
 ## Setup Jellyfish
 
-Start by getting Jellyfish serer up and running
+Start by getting Jellyfish server up and running
 
 First, let's create `.env` file with env vars for Jellyfish
 
@@ -46,7 +46,7 @@ ifconfig en0
 Then run
 
 ```bash
-docker run --env-file .env -p 50000-50050:50000-50050/udp -p 5000:5000/tcp -p 49999:49999/tcp ghcr.io/jellyfish-dev/jellyfish:latest
+docker run --env-file .env -p 50000-50050:50000-50050/udp -p 5000:5000/tcp -p 49999:49999/tcp ghcr.io/jellyfish-dev/jellyfish:0.1.0-dev
 ```
 
 ### Run locally
@@ -67,7 +67,7 @@ $ curl localhost:5000
 Let's create a Phoenix app with our buisness logic. Once again we'll start with Phoenix generator with following flags
 
 ```bash
-mix phx.new --no-ecto --no-live --no-mailer --no-gettext jellyroom
+mix phx.new --no-ecto --no-live --no-mailer --no-gettext --no-tailwind jellyroom
 ```
 
 Add Jellyfish SDK to Elixir deps in `mix.exs`:
@@ -81,41 +81,106 @@ Add Jellyfish SDK to Elixir deps in `mix.exs`:
 Go to assets directory and install Jellyfish JS dependencies:
 
 ```bash
+npm install https://github.com/jellyfish-dev/ts-client-sdk typescript
+```
+
+```bash
 npm install jellyfish-dev/jellyfish-react-client/jellyfish#main --save
 ```
 
 Now we're ready to start development of our own videoconferencing app.
 
+## App communication description
+
+In this exercise we will implement simple conference app with use of Jellyfish Media Server.
+Jellyfish API is composed of three layers:
+
+* a REST API for managing Jellyfish state
+* a WS connection for client SDK communication (socket path /socket/peer)
+* a WS connection for server notifications (socket path /socket/server) (This feature is during development)
+
+But we will mostly use two out of three layers in this exercise, the last can be used in the last optional task. If you want get more information about Jellyfish architecture, you can read [here](https://jellyfish-dev.github.io/jellyfish-docs/getting_started/architecture).
+
+The diagram of final architecture of this app is below. 
+`Backend` is responsible for authorizing incoming peers and creating or deleting resources on `Jellyfish`. 
+`Frontend` comunicates with `Backend` to obtain a `PeerToken`, which allow its to connect to `Jellyfish` and start sending and receiving media from and to `Jellyfish`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- Learn more at https://mermaid-js.github.io/mermaid -->
+
+```mermaid
+flowchart TB
+    Frontend <--websocket--> Backend
+    Frontend <--websocket--> Jellyfish
+    Backend <--Rest API--> Jellyfish
+```
+
 ## Client to backend connection
 
-We'll start by setting up our frontend to backend connection and calling Jellyfish API. Our goal will be to obtain a token associated with a room and peer that frontend can use to establish a direct connection to Jellyfish.
+We'll start by setting up our frontend to backend connection and calling Jellyfish API. 
+Our goal will be to obtain a token associated with a room and peer that frontend can use to establish a direct connection to Jellyfish.
+Later on, we'll build architecture managing the rooms and peers on our backend, but we'll start with something much simpler. 
+After this section each peer should create their own room and join it sucesfully.
 
-Later on, we'll build architecture managing the rooms and peers on our backend, but we'll start with something much simpler:
-
-1. For authorization, we'll need to setup the same secret/token as passed to the Jellyfish. I'd suggest setting it in `config.exs`, but it can be hard-coded for now.
+1. For authorization in jellyfish, we'll need to setup the same secret/token as passed to the Jellyfish. I'd suggest setting it in `config.exs`, but it can be hard-coded for now.
 2. Create a new [`Phoenix.Channel`](https://hexdocs.pm/phoenix/channels.html)
-3. On join, send messsage to self and let the user join.
-4. Handle the message sent above and create a new [`Jellyfish.Client`](https://hexdocs.pm/jellyfish_server_sdk/Jellyfish.Client.html) and use it to create a new [`Jellyfish.Room`](https://hexdocs.pm/jellyfish_server_sdk/Jellyfish.Room.html). Then add a new `webtrc` peer to the room. Remember to assign client, room and the peer to the socket.
-5. From the above callback push the token over socket
-6. We should be handling termination of the room - we will handle it better later, for now we may add a simple process monitoring channel's process calling `Room.delete` on channel exit.
+3. On join, send messsage to `self` and let the user join.
+4. Handle the message sent above and create a new [`Jellyfish.Client`](https://hexdocs.pm/jellyfish_server_sdk/Jellyfish.Client.html) and use it to create a new [`Jellyfish.Room`](https://hexdocs.pm/jellyfish_server_sdk/Jellyfish.Room.html). Then add a new `webtrc` peer to the room. Remember to assign `client`, `room_id` and `peer_id` to socket.
+5. From the above callback push the peer token over socket
+   <!-- Maybe a seperate task -->
+6. We should be handling termination of the room - we will handle it better later, for now we may add a simple process monitoring channel's process calling `Room.delete` on channel exit in `Room` genserver.
 7. Go to the JS part of the channel and handle the token message.
+
+If you correctly implement all points above you should receive token on fronted and could log it.
 
 ## Frontend - let's send some media to Jellyfish
 
-The next step is to use the obtained token to start sending media to Jellyfish. We're going to use JS WebRTC APIs and [Jellyfish TS client](https://github.com/jellyfish-dev/jellyfish-react-client/blob/update-readme/src/jellyfish/readme.md).
+The current state is that, on jellyfish is created room and peer and also client received a `PeerToken`.
+The next step is to use this token to start sending media to Jellyfish. 
+Then we will have to handling 
+We're going to use JS WebRTC APIs and [Jellyfish TS client](https://github.com/jellyfish-dev/ts-client-sdk/blob/main/readme.md). 
+This client sdk is used for sending and receving media.
+
+So first we have have to intialize our jellyfish client. 
+Jellyfish client will interact with you js app, through callbacks, that's why implementing them will be our next task.
+There are [many callbacks](https://jellyfish-dev.github.io/ts-client-sdk/interfaces/MessageEvents.html) that you can implement, but now we can focus on a few of them.
+We will first implement callbacks before connecting to jellyfish instance to avoid race conditions.
+So first callback will handle situation when peer sucessfully joins room, after sucesfully joining to webrtc, we can start send media through webrtc.
+Similarly to previous exercise, we have to acquire own camera and display it locally and then add it to our jellyfish client through [webrtc property](https://jellyfish-dev.github.io/ts-client-sdk/classes/JellyfishClient.html#webrtc).
+Another thing to do is prepare yourself for receiving video from other peers, for that we have to create video element for each peer that is in room or will join room, also we have attach ready tracks to proper video elements.
+Then we can finally connect to jellyfish instance, here we will pass obtained token.
+
+1. Initialize jellyfish client. Remember that client should connect to docker instead of your backend.
+2. Acquire media and send them through webrtc.
+3. Handle incoming tracks by assigning them to some video element.
+4. Handle peer's leaving, by removing it video element.
+5. Connect to jellyfish instance.
+
+After this each peer joins a seperate room and is ready to receive media from server and that will be our next goal to join multiple peers in the same room.
 
 ## Room management
 
-It is now time to get back to our backend. We need to build an infrastructure around rooms to enable connecting the peers.
+So after previous steps we have clients connected to `Jellyfish`.
+They are sending media to `Jellyfish` and are ready to receive them from server, but they are in different rooms and it will be our next task to build an infrastructure around rooms to enable connecting the peers.
+So it is now time to get back to our backend. 
+All of these should allow us to connect multiple peers in the same room and multiple rooms running in the same time.
 
 1. Add a registry to `application.exs`
 2. Create a `GenServer` called `Meeting` responsible for creating Jellyfish room. API:
-   * A function for getting a room from registry or spawning a new one if it doesn't exist
+   * A function for getting a `Meeting` from registry or spawning a new one if it doesn't exist
    * Should get a name as a starting parameter and use it as a key to register in the Registry
    * Create a room right after start (`handle_continue`)
    * Accept a call for room join that will return a token and monitor the caller
-   * Notify the peers about new peers joining
-   * TODO: continue
+   * When some caller is down remove it from jellyfish room
+   * When all peers left room, also remove room from jellyfish and stop `Meeting` process.
 3. Create a form at root path to input room name and redirect to `/room/:name`
 4. Add a layout for `/room/:name` path
-5. Adjust Channel to spawn or call the room process based on registry
+5. Adjust Channel to spawn or call the room process based on registry.
+
+After implementing all of these multiple peers should be able to join the same room and see each other and also multiple rooms can run in parallel.
+
+## Optional task handling server notification
+
+One of the newest feature in Jellyfish is [server notifcations](https://github.com/jellyfish-dev/jellyfish/pull/27) from jellyfish, [docs about this](https://jellyfish-dev.github.io/jellyfish-docs/api_reference).
+Currently our [elixir-sdk](https://hexdocs.pm/jellyfish_server_sdk/readme.html) doesn't support it, but you should be able to implement it yourself with use [websockex](https://hexdocs.pm/websockex/WebSockex.html).
