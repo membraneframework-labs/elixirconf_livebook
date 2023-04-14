@@ -11,13 +11,11 @@ defmodule Jellyroom.Meeting do
   def init([id]) do
     client = Client.new("http://localhost:5001", "notoken")
 
-    Process.register(self(), __MODULE__)
     {:ok, %{peers: %{}, client: client, id: id}, {:continue, nil}}
   end
 
   @impl true
   def handle_continue(_continue_arg, state) do
-    IO.inspect(:continune)
     {:ok, %Jellyfish.Room{id: room_id}} = Room.create(state.client, max_peers: 10)
 
     {:noreply, Map.put(state, :room_id, room_id)}
@@ -30,10 +28,6 @@ defmodule Jellyroom.Meeting do
 
     Process.monitor(peer_pid)
 
-    for peer <- Map.keys(state.peers) do
-      send(peer, {:peer_joined, peer_id})
-    end
-
     {:reply, token, %{state | peers: Map.put(state.peers, peer_pid, peer_id)}}
   end
 
@@ -44,11 +38,12 @@ defmodule Jellyroom.Meeting do
 
     :ok = Room.delete_peer(state.client, state.room_id, peer_id)
 
-    for peer <- Map.keys(peers) do
-      send(peer, {:peer_left, peer_id})
+    if map_size(peers) == 0 do
+      Room.delete(state.client, state.room_id)
+      {:stop, :normal, %{state | peers: peers}}
+    else
+      {:noreply, %{state | peers: peers}}
     end
-
-    {:noreply, %{state | peers: peers}}
   end
 
   @spec get_meeting(room_id :: binary()) :: pid()

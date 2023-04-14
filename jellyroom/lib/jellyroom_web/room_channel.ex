@@ -1,8 +1,7 @@
 defmodule JellyroomWeb.RoomChannel do
   use Phoenix.Channel
 
-  alias Phoenix.Socket
-  alias Jellyfish.{Client, Room}
+  alias Jellyfish.Room
   alias Jellyroom.Meeting
 
   @impl true

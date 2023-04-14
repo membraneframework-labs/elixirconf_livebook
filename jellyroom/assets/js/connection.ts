@@ -6,8 +6,6 @@ import { Peer, TrackContext } from "@jellyfish-dev/membrane-webrtc-js"
 export const createClient = (peerToken, localStream: MediaStream): JellyfishClient<{}, {}> => {
     const client = new JellyfishClient(); // if url is not provided, it will default to ws://localhost:4000/socket/websocket
 
-    let peers: [Peer]
-
     const config = {
         peerMetadata: { name: "peer" },
         isSimulcastOn: false,
