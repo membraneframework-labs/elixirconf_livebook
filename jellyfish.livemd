@@ -1,5 +1,11 @@
 # Creating Jellyfish conference
 
+## Resources
+
+* [Jellyfish docs](https://jellyfish-dev.github.io/jellyfish-docs/)
+* [Server SDK docs](https://hexdocs.pm/jellyfish_server_sdk/readme.html)
+* [TS client docs](https://jellyfish-dev.github.io/ts-client-sdk/)
+*
 ## Setup Jellyfish
 
 Start by getting Jellyfish server up and running
