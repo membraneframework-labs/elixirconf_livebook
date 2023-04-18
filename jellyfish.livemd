@@ -142,7 +142,7 @@ You can use two separate callbacks for that or one, a decision is up to you.
 Some potentially useful functions operating on DOM: [getElementById](https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById), [cloneNode](https://developer.mozilla.org/en-US/docs/Web/API/Node/cloneNode) and [appendChild](https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild).
 Then we can finally connect to the jellyfish instance, here we will pass the obtained token.
 
-1. Initialize jellyfish client. Remember that the client should connect to docker instead of your backend.
+1. Initialize jellyfish client. Remember that the client should connect to Jellyfish (port 5000 if following this document) instead of your backend.
 2. Acquire media and send them through Webrtc.
 3. Handle incoming tracks by assigning them to some video element.
 4. Handle peers leaving, by removing it video element.
