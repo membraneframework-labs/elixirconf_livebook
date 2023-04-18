@@ -122,7 +122,7 @@ Later on, we'll build architecture managing the rooms and peers on our backend, 
 6. We should be handling the termination of the room - we will handle it better later, for now, we may simply call `Room.delete` on the channel exit.
 7. Go to the JS part of the channel and handle the token message.
 
-If you correctly implement all points above you should receive a token on fronted and could log it.
+If you correctly implement all the points above you should receive a token on the frontend and you may log it to the browser's console.
 
 ## Frontend - let's send some media to Jellyfish
 
