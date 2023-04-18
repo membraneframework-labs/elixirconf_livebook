@@ -4,7 +4,7 @@ This repo contains livebooks with the workshop tasks.
 
 ## Prerequisites
 
-You'll need [livebook]() installed on your machine.
+You'll need [livebook](https://livebook.dev) installed on your machine.
 Go to the https://github.com/livebook-dev/livebook#installation for instruction
 
 ## Part 1 - WebRTC introduction
