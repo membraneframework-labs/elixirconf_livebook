@@ -135,7 +135,7 @@ This client SDK notifies the browser about situations like a new peer joining or
 First things first. We have to initialize our jellyfish TS client, it will interact with your js app, through callbacks, that's why implementing them will be our next task.
 There are [many callbacks](https://jellyfish-dev.github.io/ts-client-sdk/interfaces/MessageEvents.html) that you can implement, but now we can focus on a few of them.
 Remember to define callbacks before connecting to the jellyfish instance to avoid race conditions.
-So the first callback will handle a situation when a peer successfully joins the room, this is a moment when we can start sending media through Webrtc.
+So the first callback will handle a situation when a peer successfully joins the room, this is a moment when we can start sending media through WebRTC.
 Similarly to the previous exercise, we have to acquire our own camera and display it locally and then add it to our jellyfish client.
 Another thing to do is prepare yourself for receiving videos from other peers, for that we have to create a video element for each peer that is in a room or will join the room, also we have to attach ready tracks to proper video elements.
 You can use two separate callbacks for that or one, a decision is up to you.
