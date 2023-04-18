@@ -91,7 +91,7 @@ Jellyfish API is composed of three layers:
 * a WS connection for client SDK communication (socket path /socket/peer)
 * a WS connection for server notifications (socket path /socket/server) (This feature is during development)
 
-But we will mostly use two out of three layers in this exercise, the last can be used in the last optional task. If you want to get more information about Jellyfish architecture, you can read [here](https://jellyfish-dev.github.io/jellyfish-docs/getting_started/architecture).
+But we will mostly use two out of three layers in this exercise, the last can be used in the last optional task. If you want to get more information about Jellyfish architecture, you can read it [here](https://jellyfish-dev.github.io/jellyfish-docs/getting_started/architecture).
 
 The diagram of the final architecture of this app is below. 
 `Backend` is responsible for authorizing incoming peers and creating or deleting resources on `Jellyfish`. 
