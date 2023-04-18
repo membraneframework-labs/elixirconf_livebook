@@ -132,7 +132,7 @@ Then we will have to add handling for messages received from Jellyfish.
 We're going to use JS WebRTC APIs and [Jellyfish TS client](https://jellyfish-dev.github.io/ts-client-sdk/). 
 This client SDK notifies the browser about situations like a new peer joining or receiving a new track.
 
-First things first we have to initialize our jellyfish TS client, it will interact with your js app, through callbacks, that's why implementing them will be our next task.
+First things first. We have to initialize our jellyfish TS client, it will interact with your js app, through callbacks, that's why implementing them will be our next task.
 There are [many callbacks](https://jellyfish-dev.github.io/ts-client-sdk/interfaces/MessageEvents.html) that you can implement, but now we can focus on a few of them.
 Remember to define callbacks before connecting to the jellyfish instance to avoid race conditions.
 So the first callback will handle a situation when a peer successfully joins the room, this is a moment when we can start sending media through Webrtc.
