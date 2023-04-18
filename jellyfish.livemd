@@ -126,7 +126,7 @@ If you correctly implement all the points above you should receive a token on th
 
 ## Frontend - let's send some media to Jellyfish
 
-The current state is that on jellyfish is created room and peer and also the client (browser) received a `PeerToken`.
+At this stage, when the user enters the page a room and peer are created on Jellyfish and the client (browser) receives a `PeerToken`.
 The next step is to use this token to successfully connect to Jellyfish and start sending media to it. 
 Then we will have to add handling for messages received from Jellyfish. 
 We're going to use JS WebRTC APIs and [Jellyfish TS client](https://jellyfish-dev.github.io/ts-client-sdk/). 
