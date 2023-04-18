@@ -23,3 +23,184 @@ mix phx.new \
 ```
 
 ## getUserMedia
+
+We will start our WebRTC journey by acquiring our local audio and video, then to verify that we acquired it properly we will display our video on our page.  
+But let's begin with a brief introduction. For acquiring audio and video we will use [MediaStream API](https://developer.mozilla.org/en-US/docs/Web/API/Media_Capture_and_Streams_API). It is an API related to WebRTC which provides support for streaming audio and video data. This API defines methods that allow you for example: to list all accessible audio and video devices on your computer, to create a MediaStream from Canvas Element and also to get MediaStreams from your current devices. And how you can guess the last one is the functionality that we will use, this function is [MediaDevices.getUserMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#syntax).
+This function returns you a promise of MediaStream object. As for this object, the most important information is it contains audio and video tracks and you can set it as `srcObject` in the video HTML element. After that video element will play this media. For the curios docs of [MediaStream object](https://developer.mozilla.org/en-US/docs/Web/API/MediaStream).
+
+So here is a list of todos (in parentheses will be listed names of files where modifications should be made):
+
+1. Acquire a MediaStream from your local camera (`app.js`)
+2. Remove Phoenix boilerplate and add video element. Remember about an id! (`index.html.heex`)
+3. Insert MediaStream to created video element as it srcObject (`app.js`)
+
+As a result you should see a video of yourself on the main page of application.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### SDP and codecs
+
+<!-- livebook:{"break_markdown":true} -->
+
+Okay, it's a good start, now our next goal will be to create a P2P connection through WebRTC, so we want to see the video of a second peer. To achieve that we will need some more information about the used API.
+
+To create a connection between two peers we will need to create an [RTCPeerConnection object](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection). It stores all the information about the current connection and we can modify that connection by calling methods on this object. Before sending media through PeerConnection we have to add tracks, which we want to send. We can get these tracks from our MediaStream as it aggregates MediaTracks. Unfortunately, we can't simply add MediaStream to a PeerConnection. Instead, we have to iterate over MediaTracks and add them one by one.
+
+After adding tracks we can create an SDP offer from our PeerConnection. SDP negotiation allows peers to decide what parameters will the media going through connection have. In essence, the offerer sends a list of tracks including their type, direction (send/receive) and possible codecs. The other peer responds with an answer containing that list filtered by his capabilities. It can be seen as an intersection of things supported and accepted by both peers.
+
+So to sum what we want to achieve after this section:
+
+1. Create PeerConnection object (`app.js`)
+2. Add tracks to peerConnection (`app.js`)
+3. Create SDP offer and print it(`app.js`)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Further PeerConnection configuration
+
+<!-- livebook:{"break_markdown":true} -->
+
+The next step will be to configure `iceCandidate` handler. ICE candidates are used for connection establishment. Each candidate contains information about what protocol it supports (TCP/UDP/TLS) and what type of candidate it is (host/server reflexive/relay). For now, we can only want to inspect them, so let's log them to the console.
+
+After implementing `iceCandidate` handler we have to change the current local description of our connection. We can do that by calling a proper method on [peerConnection object](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection). After this step and refreshing browser, you should see logged ICE candidates. Try to answer the following questions:
+
+* how many ice candidates do you see?
+* what types do they have?
+* what are the differences between candidates?
+
+After that, we will change the initial configuration of PeerConnection. You can do that by passing parameters to its [constructor](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection). Let's start with setting `bundlePolicy` to `max-bundle`. What did change in comparison to previous candidates?
+
+Next we want to add STUN servers to PeerConnection configuartion, we will use here our Membrane servers:
+
+```javascript
+iceServers: [
+ {urls: "stun:turn.membrane.video"},
+ // in case of failure {urls: "stun:stun.l.google.com:19302" }
+]
+```
+
+What did change after this modification?
+
+Then, we can also add TURN servers to the PeerConnection.
+
+```javascript
+iceServers: [
+ {
+   urls: [
+     "turn:turn.membrane.video?transport=udp",
+     "turn:turn.membrane.video:3478?transport=tcp",
+     "turns:turn.membrane.video:443?transport=tcp"
+   ],
+   username: "turn",
+   credential: "T45B264i89p9"
+ }
+]
+```
+
+And also we could set option `iceTransportPolicy` to `relay`.
+How candidates look after this modification?
+
+1. Set iceCandidate handler, which prints ice candidates (`app.js`)
+2. Set local description (`app.js`)
+3. Modify PeerConnection by adding `max-bundle` parameter (`app.js`)
+4. Add iceServers to PeerConnection configuration (`app.js`)
+5. Add TURN servers in iceServers configuration (`app.js`)
+6. Modify PeerConnection by adding `iceTransportPolicy` parameter (`app.js`)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Signaling between clients
+
+<!-- livebook:{"break_markdown":true} -->
+
+After learning a little bit about ICE candidates and the configuration of PeerConnection we can comment out the code responsible for printing out candidates and move toward implementing a signaling server.
+
+Our goal is to implement an intermediary between two peers that want to connect.
+Examples of information that will go through signaling server are SDP Offer, SDP Answer and ICE candidates.
+WebRTC standard doesn't specify any transport mechanism for the signaling, so we will use [Phoenix Channels](https://hexdocs.pm/phoenix/channels.html) for this. 
+They enable bidirectional, soft real-time communication between the server and clients, usually based on WebSockets and integrated with Phoenix PubSub solution.
+
+There are many possible approaches to this problem, but we'll start with something simple - a single channel used to broadcast signaling messages. This solution will only allow us to connect 2 peers, but we may optionally fix this later.
+
+The first step will be adding a `Phoenix.Socket` to an endpoint (see [the docs](https://hexdocs.pm/phoenix/Phoenix.Socket.html)). The socket module will only have to define a channel's topic (let's say `"room"`) and a module, that will handle it. Creating that one, named for example `PeerChannel` will be a next step.
+
+The `PeerChannel` module will be using [`Phoenix.Channel`](https://hexdocs.pm/phoenix/channels.html) and should implement appropriate callbacks. We won't be doing any authorization, but we'd like to pass any message received from fronted to the other peer using the same channel. (Important info - sender shouldn't receive the "echoed" message)
+
+Moving to the frontend part - we have to create an instance of JS class [`Phoenix.Socket`](https://hexdocs.pm/phoenix/js/) and then inside this socket connection we want to join the channel with topic `"room"` and handle the result.
+If following [the official Channels guide](https://hexdocs.pm/phoenix/channels.html) on how to implement channel join, refreshing the frontend should print `"Joined successfully"` to browser console.
+
+1. Add socket endpoint (`endpoint.ex`)
+2. Create `UserSocket` (`user_socket.ex`)
+3. Implement peerChannel module (`peer_channel.ex`)
+4. Create instance of `Phoenix.Socket` and join channel `"room"` on this socket (`app.js`)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Connecting with second browser
+
+<!-- livebook:{"break_markdown":true} -->
+
+After implementing signaling server and creating channel on frontend we have to implement the actual communication between peers.
+
+We will start by cleaning up the code from previous steps - it would be best to leave only getting the user media, showing the local video, creating a Peer connection and adding tracks. The rest will be added again in proper callbacks.
+
+Here's the communication schema from the presentation:
+![](images/WebRTC_communication.drawio.png)
+
+Our signaling server is responsible for communication between Peer A and Peer B on the picture.
+This means we will be exchanging following messages:
+
+* `joined` after joining the channel
+* `sdp_offer` with SDP offer from browser as payload
+* `sdp_answer` sent as response to offer
+* `ice_candidate` sent by both sides after SDP exchange informing the other side of possible ways to establish multimedia connection
+
+The first two will determine the role of Peers inside the `"room"` channel. Both should send `joined` first. With only one peer in room, this message won't be received by anyone, but when second peer will join, the first one will get the message and start the signaling.
+This means the peer that will receive `joined` first will become Peer A, and the one receiving `sdp_offer` as first will become Peer B.
+
+Based on that, I'll suggest creating 2 functions `becomeOfferSender` and `becomeOfferReceiver` and call them in handlers of proper messages, but this is optional.
+
+Peer A, after receiving `joined` message the peer should create SDP offer, push it through channel as `sdp_offer` and update local description in RTCPeerConnection.
+This will trigger ICE candidate generation, so we'll need to add a callback that will send it as `ice_candidate` message.
+Last thing to handle is the `sdp_answer` that should be set as remote description in Peer connection
+
+To implement Peer B behaviour we need to handle `sdp_offer` message. It should update remote description based on SDP offer, then create SDP answer, forward it as `sdp_answer` through channel and update local description with SDP answer.
+
+Both sides should handle `ice_candidate` message by addding the received candidate to Peer connection state.
+Last thing to add for both sides is a `track` event handler (via `ontrack` property of peer connection), in this function we have to assign received `MediaStream` to some HTML video element - either created with JS API or added manually to `home.html.heex`.
+
+1. Cleanup ICE candidate handling and SDP generation (`app.js`)
+2. Implement handler for `joined` message. (`app.js`)
+3. Implement handler for `sdp_offer` message (`app.js`)
+4. Implement handler for `sdp_answer` message (`app.js`)
+5. Implement handler for `ice_candidate` message (`app.js`)
+6. [Optionally] Add new `video` HTML element (`home.html.heex`)
+7. Add `ontrack` event handler to `PeerConnection` (`app.js`)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### WebRTC internals in Chrome
+
+<!-- livebook:{"break_markdown":true} -->
+
+You can observe some stats about your connection in [WebRTC internals](chrome://webrtc-internals/).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Remote test with use of NGROK
+
+<!-- livebook:{"break_markdown":true} -->
+
+The next step in our journey will be connecting two peers from different devices.
+There is a small obstacle though, a page that wants to access media devices has to use a secure connection (there's an exception for `localhost`), so it should be served via HTTPS with a valid SSL certificate.
+
+There are two fairly simple ways to work around this:
+
+* deploy your app through a service that will handle SSL for you e.g: [fly.io](https://fly.io/)
+* we can handle it with use of [NGROK](https://ngrok.com/), this is recommended way and will be described below
+
+1. Create a free account at NGROK
+2. Install [NGROK cli tools](https://ngrok.com/download)
+3. Setup your authtoken
+4. Create http tunnel to your phoenix app. ([docs](https://ngrok.com/docs/secure-tunnels/tunnels/http-tunnels/))
+5. Go to address created by ngrok and test your app.
