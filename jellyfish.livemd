@@ -144,7 +144,7 @@ Remember to define callbacks before connecting to the jellyfish instance to avoi
 So the first callback will handle a situation when a peer successfully joins the room, this is a moment when we can start sending media through WebRTC.
 Similarly to the previous exercise, we have to acquire our own camera and display it locally and then add it to our jellyfish client.
 Another thing to do is prepare yourself for receiving videos from other peers, for that we have to create a video element for each peer that is in a room or will join the room, also we have to attach ready tracks to proper video elements.
-You can use two separate callbacks for that or one, a decision is up to you.
+Creating an HTML element and adding tracks can be split between two callbacks or put in one.
 Some potentially useful functions operating on DOM: [getElementById](https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById), [cloneNode](https://developer.mozilla.org/en-US/docs/Web/API/Node/cloneNode) and [appendChild](https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild).
 Then we can finally connect to the jellyfish instance, here we will pass the obtained token.
 
@@ -167,12 +167,12 @@ Then we will implement this process module mentioned above.
 Lastly, we will adjust our current channel's that they will allow the existence of multiple rooms.
 All of these should allow us to connect multiple peers in the same room and multiple rooms running at the same time.
 
-1. Add a registry to `application.exs`, it will
+1. Add a registry to `application.exs`, it will allow getting `Meeting` pid by name/id
 2. Create a `GenServer` called `Meeting` responsible for creating the Jellyfish room. API:
    * A function for getting a `Meeting` from a registry or spawning a new one if it doesn't exist
    * Should get a meeting name as a starting parameter and use it as a key to register in the Registry
    * Create a room right after start (`handle_continue`)
-   * Channel should now send a request to join to `Meeting` process and the `Meeting` process should accept a request and return a token and also create a monitor on the Channel process.
+   * A call to join to `Meeting` process that will add a Jellyfish peer and return a token. It should also create a monitor on the caller.
    * When some caller is down remove it from the jellyfish room
    * When all peers left the room, also remove the room from the jellyfish and stop the `Meeting` process.
 3. Create a form at the root path to input the room name and redirect to `/room/:name`
