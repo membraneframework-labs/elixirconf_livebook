@@ -143,7 +143,7 @@ Some potentially useful functions operating on DOM: [getElementById](https://dev
 Then we can finally connect to the jellyfish instance, here we will pass the obtained token.
 
 1. Initialize jellyfish client. Remember that the client should connect to Jellyfish (port 5000 if following this document) instead of your backend.
-2. Acquire media and send them through Webrtc.
+2. Acquire media and send them through WebRTC.
 3. Handle incoming tracks by assigning them to some video element.
 4. Handle peers leaving, by removing it video element.
 5. Connect to jellyfish instance.
