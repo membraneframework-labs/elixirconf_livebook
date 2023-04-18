@@ -115,7 +115,7 @@ Our goal will be to obtain a token associated with a room and peer that frontend
 Later on, we'll build architecture managing the rooms and peers on our backend, but we'll start with something much more simple. To be precise, each peer will create their own room and join it.
 
 1. For authorization in jellyfish, we'll need to set up the same secret/token as passed to the Jellyfish. We can do this by setting in `config.exs` variable `:server_api_token` in application `:jellyfish_server_sdk` (See [the docs for new/1](https://hexdocs.pm/jellyfish_server_sdk/Jellyfish.Client.html#new/1)), but we can also pass it when [creating an sdk client](https://hexdocs.pm/jellyfish_server_sdk/Jellyfish.Client.html#new/2).
-2. Create a new [`Phoenix.Channel`](https://hexdocs.pm/phoenix/channels.html), which will be responsible for the communication browser and backend.
+2. Create a new [`Phoenix.Channel`](https://hexdocs.pm/phoenix/channels.html), which will be responsible for the communication between the browser and the backend.
 3. On join, send a message to `self` and let the user join.
 4. Handle the message sent above and create a new [`Jellyfish.Client`](https://hexdocs.pm/jellyfish_server_sdk/Jellyfish.Client.html) and use it to create a new [`Jellyfish.Room`](https://hexdocs.pm/jellyfish_server_sdk/Jellyfish.Room.html). Then add a new `webtrc` peer to the jellyfish room. Remember to assign `client`, `room_id`, and `peer_id` to the socket.
 5. From the above callback push the `PeerToken` over the socket.
