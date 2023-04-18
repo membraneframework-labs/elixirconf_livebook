@@ -156,7 +156,7 @@ Our next goal is to add the possibility to join multiple peers in the same room.
 
 So after the previous steps, we have clients connected to `Jellyfish`.
 They are sending media to `Jellyfish` and are ready to receive them from the server, but they are in different rooms and it will be our next task to build an infrastructure around rooms to enable connecting them together.
-So it is now time to get back to our backend, first, we will add a registry that will contain processes that will be responsible for managing one Jellyfish room.
+It is now time to get back to our backend. First, we will add a registry that will contain processes that will be responsible for managing one Jellyfish room.
 Then we will implement this process module mentioned above. 
 Lastly, we will adjust our current channel's that they will allow the existence of multiple rooms.
 All of these should allow us to connect multiple peers in the same room and multiple rooms running at the same time.
