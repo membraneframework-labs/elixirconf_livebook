@@ -181,6 +181,10 @@ All of these should allow us to connect multiple peers in the same room and mult
 
 After implementing all of these multiple peers should be able to join the same room and see each other and also multiple rooms can run in parallel.
 
+## A reference implementation
+
+In case of troubles, you may find the reference implementation in elixirconf_livebook repo on a branch `jellyroom`
+
 ## Optional task handling server notification
 
 One of the newest features in Jellyfish is [server notifications](https://github.com/jellyfish-dev/jellyfish/pull/27) from jellyfish, [docs about this](https://jellyfish-dev.github.io/jellyfish-docs/api_reference).

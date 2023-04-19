@@ -185,6 +185,10 @@ Last thing to add for both sides is a `track` event handler (via `ontrack` prope
 
 You can observe some stats about your connection in [WebRTC internals](chrome://webrtc-internals/).
 
+## Reference implementation
+
+In case of trouble, you can check the reference implementation inside `elixirconf_livebook` repo on a branch `solution_1`
+
 <!-- livebook:{"break_markdown":true} -->
 
 ### Remote test with use of NGROK
